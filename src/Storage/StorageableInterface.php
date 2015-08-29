@@ -11,6 +11,15 @@ interface StorageableInterface
     public function url($styleName);
 
     /**
+     * Return an expiring url for a file upload.
+     *
+     * @param  string $expiry
+     * @param  string $styleName
+     * @return string|null
+     */
+    public function expiringUrl($expiry, $styleName);
+
+    /**
      * For filesystem storage this method returns the path (on disk) of a file upload.
      * For s3 storage this method returns the key an uploaded object is stored under in a bucket.
      *

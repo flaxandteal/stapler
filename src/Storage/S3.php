@@ -39,6 +39,18 @@ class S3 implements StorageableInterface
     }
 
     /**
+     * Return an expiring url for a file upload.
+     *
+     * @param  string $expiry
+     * @param  string $styleName
+     * @return string|null
+     */
+    public function expiringUrl($expiry, $styleName)
+    {
+        return $this->s3Client->getObjectUrl($this->attachedFile->s3_object_config['Bucket'], $this->path($styleName), $expiry, ['PathStyle' => true]);
+    }
+
+    /**
      * Return the url for a file upload.
      *
      * @param  string $styleName

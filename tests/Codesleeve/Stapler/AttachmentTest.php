@@ -82,6 +82,26 @@ class AttachmentTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Calling the expiringUrl method with a style parameter should
+     * return the url for that style.
+     * 
+     * @test
+     * @return void
+     */
+    public function it_should_be_able_to_return_an_expiring_attachment_url_matching_the_storage_driver()
+    {
+        $attachment = $this->build_attachment();
+        $symfonyUploadedFile = new SymfonyUploadedFile(__DIR__ . '/Fixtures/empty.gif', 'empty.gif', null, null, null, true);
+        $staplerUploadedFile = $attachment->setUploadedFile($symfonyUploadedFile);
+        $storageDriver = $attachment->getStorageDriver();
+        
+        $url = $attachment->expiringUrl('thumbnail');
+        $storageUrl = $storageDriver->expiringUrl('thumbnail');
+
+        $this->assertEquals($storageUrl, $url);
+    }
+
+    /**
      * Calling the path method with a style parameter should
      * return the path for that style.
      * 

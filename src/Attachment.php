@@ -298,6 +298,23 @@ class Attachment
     }
 
     /**
+     * Generates an expiring url to an uploaded file (or a resized version of it),
+     * or null if not possible for this file.
+     *
+     * @param string $expiry
+     * @param string $styleName
+     * @return string|null
+    */
+    public function expiringUrl($expiry, $styleName = '')
+    {
+        if ($this->originalFilename()) {
+            return $this->storageDriver->expiringUrl($expiry, $styleName, $this);
+        }
+
+        return null;
+    }
+
+    /**
      * Generates the file system path to an uploaded file (or a resized version of it). 
      * This is used for saving files, etc.
      *

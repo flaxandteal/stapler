@@ -23,6 +23,19 @@ class Filesystem implements StorageableInterface
     }
 
     /**
+     * Return an expiring url for a file upload.
+     * (not currently possible in filesystem)
+     *
+     * @param  string $expiry
+     * @param  string $styleName
+     * @return string|null
+     */
+    public function expiringUrl($expiry, $styleName)
+    {
+        return null;
+    }
+
+    /**
      * Return the url for a file upload.
      *
      * @param  string $styleName
