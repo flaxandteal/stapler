@@ -1,14 +1,21 @@
 <?php namespace Codesleeve\Stapler\File;
 
 use Aws\S3\S3Client;
+use CodeSleeve\Stapler\Stapler;
 use CodeSleeve\Stapler\Factories\File as FileFactory;
+use Codesleeve\Stapler\Config\ConfigurableInterface as ConfigurableInstance;
 
-class S3File implements FileInterface
+class S3File implements S3FileInterface
 {
     /**
      * Standard approach to checking for image type.
      */
     use MimeCheckingTrait;
+
+    /**
+     * Provide a caching key.
+     */
+    use CachingKeyTrait;
 
     /**
      * The AWS S3Client instance.
@@ -25,10 +32,16 @@ class S3File implements FileInterface
     protected $filePath;
 
     /**
-     * S3 configuration.
+     * S3 client configuration.
      * @var array
      */
-    protected $config;
+    public $s3_client_config;
+
+    /**
+     * S3 default object configuration.
+     * @var array
+     */
+    public $s3_object_config;
 
     /**
      * File factory for producing local files
@@ -43,18 +56,23 @@ class S3File implements FileInterface
      * cheap to re-use)
      *
      * @param string $filePath
-     * @param Aws\S3\S3Client $s3Client
+     * @param Codesleeve\Stapler\Config\ConfigurableInterface $config
      */
-    public function __construct($filePath, $config, S3Client $s3Client, FileFactory $fileFactory)
+    public function __construct($filePath, ConfigurableInstance $config)
     {
-        $this->s3Client = $s3Client;
-        $this->fileFactory = $fileFactory;
+        $config = $config->get('s3');
+        $this->s3_client_config = $config['s3_client_config'];
+        $this->s3_object_config = $config['s3_object_config'];
+
+        $this->s3Client = Stapler::getS3ClientInstance($this);
 
         $this->filePath = $filePath;
 
+        $bucket = $this->s3_object_config['Bucket'];
+
         /* This object makes no sense without these properties... */
         $this->metadata = $this->s3Client->headObject([
-            'Bucket' => $this->config['s3_object_config']['Bucket'],
+            'Bucket' => $bucket,
             'Key' => $this->filePath
         ]);
     }
@@ -76,7 +94,7 @@ class S3File implements FileInterface
      */
     public function getSize()
     {
-        return $this->metadata['Content-Length'];
+        return $this->metadata['ContentLength'];
     }
 
     /**
@@ -86,7 +104,27 @@ class S3File implements FileInterface
      */
     public function getMimeType()
     {
-        return $this->metadata['Content-Type'];
+        return $this->metadata['ContentType'];
+    }
+
+    /**
+     * Return the S3 key for this file.
+     *
+     * @return string
+     */
+    public function getS3Key()
+    {
+        return $this->filePath;
+    }
+
+    /**
+     * Return the S3 bucket for this file.
+     *
+     * @return string
+     */
+    public function getS3Bucket()
+    {
+        return $this->s3_object_config['Bucket'];
     }
 
     /**
@@ -98,15 +136,16 @@ class S3File implements FileInterface
     public function localize()
     {
         $name = $this->getFilename();
+        dd(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         $localFilePath = sys_get_temp_dir() . "/$name";
 
         $file = $this->s3Client->getObject([
-            'Bucket' => $this->config['s3_object_config']['Bucket'],
-            'Key' => $this->filePath,
+            'Bucket' => $this->getS3Bucket(),
+            'Key' => $this->getS3Key(),
             'SaveAs' => $localFilePath
         ]);
 
-        return $this->fileFactory->create($localFilePath);
+        return FileFactory::create($localFilePath);
     }
 }

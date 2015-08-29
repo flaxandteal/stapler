@@ -11,6 +11,11 @@ class UploadedFile implements LocalFileInterface
     use MimeCheckingTrait;
 
     /**
+     * Provide a caching key.
+     */
+    use CachingKeyTrait;
+
+    /**
      * The underlying uploaded file object that acts
      * as part of this class's composition.
      *

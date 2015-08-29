@@ -1,6 +1,8 @@
 <?php namespace Codesleeve\Stapler\File;
 
-interface FileInterface
+use Codesleeve\Stapler\StoredInterface;
+
+interface FileInterface extends StoredInterface
 {
     /**
      * Return the name of the file.

@@ -5,7 +5,7 @@ use Codesleeve\Stapler\Storage\StorageableInterface;
 use Codesleeve\Stapler\File\Image\Resizer;
 use Codesleeve\Stapler\Factories\File as FileFactory;
 
-class Attachment
+class Attachment implements StoredInterface
 {
     /**
      * The model instance that the attachment belongs to.
@@ -75,6 +75,19 @@ class Attachment
         $this->config = $config;
         $this->interpolator = $interpolator;
         $this->resizer = $resizer;
+    }
+
+    /**
+     * Retrieve a key that is unique to stored items during this request.
+     *
+     * @returns string 
+     */
+    function getCachingKey()
+    {
+        $modelName = $this->getInstanceClass();
+        $attachmentName = $this->getConfig()->name;
+
+        return "attachment.$modelName.$attachmentName";
     }
 
     /**
