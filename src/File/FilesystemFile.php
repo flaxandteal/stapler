@@ -2,12 +2,17 @@
 
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
-class File extends SymfonyFile implements LocalFileInterface
+class FilesystemFile extends SymfonyFile implements LocalFileInterface
 {
     /**
      * Standard approach to checking for image type.
      */
     use MimeCheckingTrait;
+
+    /**
+     * Provide a caching key.
+     */
+    use CachingKeyTrait;
 
     /**
      * Method for retrieving a (possibly temporary) local

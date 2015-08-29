@@ -1,7 +1,8 @@
 <?php namespace Codesleeve\Stapler\Factories;
 
+use Codesleeve\Stapler\Stapler;
 use Codesleeve\Stapler\File\Mime\MimeType;
-use Codesleeve\Stapler\File\FilesystemFilesystemFile as StaplerFile;
+use Codesleeve\Stapler\File\FilesystemFile as StaplerFile;
 use Codesleeve\Stapler\File\S3File;
 use Codesleeve\Stapler\File\UploadedFile as StaplerUploadedFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
@@ -105,9 +106,9 @@ class File
      */
     protected static function createFromS3($filePath)
     {
-        $s3Client = Stapler::getS3ClientInstance($attachment);
+        $config = Stapler::getConfigInstance();
 
-        $file = new S3File($filePath, $s3Client, $this);
+        $file = new S3File($filePath, $config);
 
         return $file;
     }

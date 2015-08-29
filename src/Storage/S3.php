@@ -80,7 +80,7 @@ class S3 implements StorageableInterface
      */
     public function move($file, $filePath)
     {
-        if ($file instanceof CodeSleeve\Stapler\File\S3FileInterface)
+        if ($file instanceof \CodeSleeve\Stapler\File\S3FileInterface)
         {
             $this->moveOnS3($file, $filePath);
         }
@@ -102,7 +102,7 @@ class S3 implements StorageableInterface
 
         $fileSpecificConfig = [
             'Key' => $filePath,
-            'CopySource' => $file->getRealPath(),
+            'CopySource' => $file->getS3Bucket() . '/' . $file->getS3Key(),
         ];
         $mergedConfig = array_merge($objectConfig, $fileSpecificConfig);
 
@@ -110,8 +110,10 @@ class S3 implements StorageableInterface
         $this->s3Client->copyObject($mergedConfig);
 
         $fileSpecificConfig = [
-            'Key' => $file->getRealPath(),
+            'Key' => $file->getS3Key(),
+            'Bucket' => $file->getS3Bucket()
         ];
+        $mergedConfig = array_merge($objectConfig, $fileSpecificConfig);
         $this->s3Client->deleteObject($mergedConfig);
     }
 

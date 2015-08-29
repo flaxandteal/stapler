@@ -162,14 +162,12 @@ class Stapler
      * If no instance has been defined yet we'll buld one and then
      * cache it on the s3Clients property (for the current request only).
      *
-     * @param  Attachment $attachedFile
+     * @param  StoredInterface $attachedFile
      * @return S3Client
      */
-    public static function getS3ClientInstance(Attachment $attachedFile)
+    public static function getS3ClientInstance(StoredInterface $attachedFile)
     {
-        $modelName = $attachedFile->getInstanceClass();
-        $attachmentName = $attachedFile->getConfig()->name;
-        $key = "$modelName.$attachmentName";
+        $key = $attachedFile->getCachingKey();
 
         if (array_key_exists($key, static::$s3Clients)) {
             return static::$s3Clients[$key];
@@ -212,7 +210,7 @@ class Stapler
      * @param $attachedFile
      * @return S3Client
      */
-    protected static function buildS3Client(Attachment $attachedFile)
+    protected static function buildS3Client(StoredInterface $attachedFile)
     {
         return S3Client::factory($attachedFile->s3_client_config);
     }
