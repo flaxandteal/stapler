@@ -3,8 +3,13 @@
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Codesleeve\Stapler\Exceptions\FileException;
 
-class UploadedFile implements FileInterface
+class UploadedFile implements LocalFileInterface
 {
+    /**
+     * Standard approach to checking for image type.
+     */
+    use MimeCheckingTrait;
+
     /**
      * The underlying uploaded file object that acts
      * as part of this class's composition.
@@ -12,23 +17,6 @@ class UploadedFile implements FileInterface
      * @var \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected $uploadedFile;
-
-    /**
-     * An array of key value pairs for valid image
-     * extensions and their associated MIME types.
-     *
-     * @var array
-     */
-    protected $imageMimes = [
-        'bmp'   => 'image/bmp',
-        'gif'   => 'image/gif',
-        'jpeg'  => ['image/jpeg', 'image/pjpeg'],
-        'jpg'   => ['image/jpeg', 'image/pjpeg'],
-        'jpe'   => ['image/jpeg', 'image/pjpeg'],
-        'png'   => 'image/png',
-        'tiff'  => 'image/tiff',
-        'tif'   => 'image/tiff',
-    ];
 
     /**
      * Constructor method.
@@ -51,30 +39,6 @@ class UploadedFile implements FileInterface
     public function __call($method, array $parameters)
     {
         return call_user_func_array([$this->uploadedFile, $method], $parameters);
-    }
-
-    /**
-     * Method for determining whether the uploaded file is
-     * an image type.
-     *
-     * @return boolean
-     */
-    public function isImage()
-    {
-        $mime = $this->getMimeType();
-
-        // The $imageMimes property contains an array of file extensions and
-        // their associated MIME types. We will loop through them and look for
-        // the MIME type of the current SymfonyUploadedFile.
-        foreach ($this->imageMimes as $imageMime)
-        {
-            if (in_array($mime, (array) $imageMime))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -142,5 +106,20 @@ class UploadedFile implements FileInterface
         $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
 
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
+    }
+
+    /**
+     * Method for retrieving a (possibly temporary) local
+     * version of this file.
+     *
+     * @return Codesleeve\Stapler\File\LocalFileInterface
+     */
+    public function localize()
+    {
+        /* Files represented by this class are always local (unless
+         * this method is overridden in a subclass), even if the
+         * attachment they will be uploaded to is not
+         */
+        return $this;
     }
 }

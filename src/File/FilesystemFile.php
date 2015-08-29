@@ -2,7 +2,7 @@
 
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
-class File extends SymfonyFile implements FileInterface
+class File extends SymfonyFile implements LocalFileInterface
 {
     /**
      * Standard approach to checking for image type.
@@ -13,7 +13,7 @@ class File extends SymfonyFile implements FileInterface
      * Method for retrieving a (possibly temporary) local
      * version of this file.
      *
-     * @return Codesleeve\Stapler\File\File
+     * @return Codesleeve\Stapler\File\LocalFileInterface
      */
     public function localize()
     {

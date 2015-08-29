@@ -93,7 +93,7 @@ class S3File implements FileInterface
      * Method for retrieving a (possibly temporary) local
      * version of this file.
      *
-     * @return Codesleeve\Stapler\File\FilesystemFile
+     * @return Codesleeve\Stapler\File\LocalFileInterface
      */
     public function localize()
     {
