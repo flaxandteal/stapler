@@ -52,6 +52,16 @@ class UploadedFile implements LocalFileInterface
     }
 
     /**
+     * Return the real path to the file.
+     *
+     * @return string
+     */
+    public function getRealPath()
+    {
+        return $this->uploadedFile->getRealPath();
+    }
+
+    /**
      * Return the size of the file.
      *
      * @return string
