@@ -1,6 +1,7 @@
 <?php namespace Codesleeve\Stapler\File\Image;
 
-use Codesleeve\Stapler\File\FileInterface;
+use Codesleeve\Stapler\File\LocalFileInterface;
+use Codesleeve\Stapler\Factories\File as FileFactory;
 use Codesleeve\Stapler\Style;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\ImageInterface;
@@ -28,11 +29,11 @@ class Resizer
     /**
      * Resize an image using the computed settings.
      *
-     * @param  FileInterface $file
+     * @param  LocalFileInterface $file
      * @param  Style $style
      * @return string
      */
-    public function resize(FileInterface $file, Style $style)
+    public function resize(LocalFileInterface $file, Style $style)
     {
         $filePath = tempnam(sys_get_temp_dir(), 'STP') . '.' . $file->getFilename();
         list($width, $height, $option) = $this->parseStyleDimensions($style);
@@ -43,7 +44,7 @@ class Resizer
             $this->resizeCustom($file, $style->dimensions)
                 ->save($filePath, $style->convertOptions);
 
-            return $filePath;
+            return FileFactory::create($filePath);
         }
 
         $image = $this->imagine->open($file->getRealPath());
@@ -55,7 +56,7 @@ class Resizer
         $this->$method($image, $width, $height)
            ->save($filePath, $style->convertOptions);
 
-        return $filePath;
+        return FileFactory::create($filePath);
     }
 
     /**

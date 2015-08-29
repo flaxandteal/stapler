@@ -395,10 +395,9 @@ class Attachment
             $file = FileFactory::create($fileLocation);
 
             if ($style->dimensions && $file->isImage()) {
+                //TODO: this is the kind of thing someone might not want to do by accident
+                $file = $file->localize();
                 $file = $this->resizer->resize($file, $style);
-            }
-            else {
-                $file = $file->getRealPath();
             }
 
             $filePath = $this->path($style->name);
@@ -510,10 +509,12 @@ class Attachment
         foreach ($this->queuedForWrite as $style)
         {
             if ($style->dimensions && $this->uploadedFile->isImage()) {
+                //TODO: this is the kind of thing someone might not want to do by accident
+                $file = $file->localize();
                 $file = $this->resizer->resize($this->uploadedFile, $style);
             }
             else {
-                $file = $this->uploadedFile->getRealPath();
+                $file = $this->uploadedFile;
             }
 
             $filePath = $this->path($style->name);
