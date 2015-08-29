@@ -75,13 +75,14 @@ class Filesystem implements StorageableInterface
      * The file can be an actual uploaded file object or the path to
      * a resized image file on disk.
      *
-     * @param  string $file
+     * @param  Codesleeve\Stapler\File\FileInterface $file
      * @param  string $filePath
      */
     public function move($file, $filePath)
     {
+        $localFile = $file->localize();
         $this->buildDirectory($filePath);
-        $this->moveFile($file, $filePath);
+        $this->moveFile($localFile, $filePath);
         $this->setPermissions($filePath, $this->attachedFile->override_file_permissions);
     }
 
@@ -117,15 +118,15 @@ class Filesystem implements StorageableInterface
     }
 
     /**
-     * Attempt to move and uploaded file to it's intended location on disk.
+     * Attempt to move an uploaded file to its intended location on disk.
      *
-     * @param  string $file
+     * @param  Codesleeve\Stapler\File\LocalFileInterface $file
      * @param  string $filePath
      * @throws Exceptions\FileException
      */
     protected function moveFile($file, $filePath)
     {
-        if (!@rename($file, $filePath))
+        if (!@rename($file->getRealPath(), $filePath))
         {
             $error = error_get_last();
             throw new Exceptions\FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $file, $filePath, strip_tags($error['message'])));

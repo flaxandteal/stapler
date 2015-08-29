@@ -87,13 +87,14 @@ class S3 implements StorageableInterface
     /**
      * Move an uploaded file to it's intended destination.
      *
-     * @param  string $file
+     * @param  CodeSleeve\Stapler\File\FileInterface $file
      * @param  string $filePath
      */
     public function move($file, $filePath)
     {
+        $localFile = $file->localize();
         $objectConfig = $this->attachedFile->s3_object_config;
-        $fileSpecificConfig = ['Key' => $filePath, 'SourceFile' => $file, 'ContentType' => $this->attachedFile->contentType()];
+        $fileSpecificConfig = ['Key' => $filePath, 'SourceFile' => $localFile->getRealPath(), 'ContentType' => $this->attachedFile->contentType()];
         $mergedConfig = array_merge($objectConfig, $fileSpecificConfig);
         
         $this->ensureBucketExists($mergedConfig['Bucket']);

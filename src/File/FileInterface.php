@@ -30,4 +30,12 @@ interface FileInterface
      * @return boolean
      */
     public function isImage();
+
+    /**
+     * Method for retrieving a (possibly temporary) local
+     * version of this file.
+     *
+     * @return Codesleeve\Stapler\File\FilesystemFile
+     */
+    public function localize();
 }

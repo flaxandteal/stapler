@@ -1,7 +1,8 @@
 <?php namespace Codesleeve\Stapler\Factories;
 
 use Codesleeve\Stapler\File\Mime\MimeType;
-use Codesleeve\Stapler\File\File as StaplerFile;
+use Codesleeve\Stapler\File\FilesystemFilesystemFile as StaplerFile;
+use Codesleeve\Stapler\File\S3File;
 use Codesleeve\Stapler\File\UploadedFile as StaplerUploadedFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
@@ -31,6 +32,10 @@ class File
 
         if (is_array($file)) {
             return static::createFromArray($file, $testing);
+        }
+
+        if (substr($file, 0, 9) == "aws-s3://") {
+            return static::createFromS3(substr($file, 9));
         }
 
         if (substr($file, 0, 7) == "http://" || substr($file, 0, 8) == "https://") {
@@ -76,13 +81,13 @@ class File
     }
 
     /**
-     * Build a Codesleeve\Stapler\File\File object from the
+     * Build a Codesleeve\Stapler\File\FilesystemFile object from the
      * raw php $_FILES array date.  We assume here that the $_FILES array
      * has been formated using the Stapler::arrangeFiles utility method.
      *
      * @param  array $file
      * @param  boolean $testing
-     * @return \Codesleeve\Stapler\File\File
+     * @return \Codesleeve\Stapler\File\FilesystemFile
      */
     protected static function createFromArray(array $file, $testing)
     {
@@ -92,11 +97,27 @@ class File
     }
 
     /**
+     * Build a Codesleeve\Stapler\File\S3File object from the
+     * configured bucket and S3 location.
+     *
+     * @param  array $filePath
+     * @return \Codesleeve\Stapler\File\S3File
+     */
+    protected static function createFromS3($filePath)
+    {
+        $s3Client = Stapler::getS3ClientInstance($attachment);
+
+        $file = new S3File($filePath, $s3Client, $this);
+
+        return $file;
+    }
+
+    /**
      * Fetch a remote file using a string URL and convert it into
-     * an instance of Codesleeve\Stapler\File\File.
+     * an instance of Codesleeve\Stapler\File\FilesystemFile.
      *
      * @param  string $file
-     * @return \Codesleeve\Stapler\File\File
+     * @return \Codesleeve\Stapler\File\FilesystemFile
      */
     protected static function createFromUrl($file)
     {
@@ -137,10 +158,10 @@ class File
 
     /**
      * Fetch a local file using a string location and convert it into
-     * an instance of \Codesleeve\Stapler\File\File.
+     * an instance of \Codesleeve\Stapler\File\FilesystemFile.
      *
      * @param  string $file
-     * @return \Codesleeve\Stapler\File\File
+     * @return \Codesleeve\Stapler\File\FilesystemFile
      */
     protected static function createFromString($file)
     {
