@@ -73,18 +73,62 @@ class S3 implements StorageableInterface
     }
 
     /**
-     * Move an uploaded file to it's intended destination.
+     * Move an uploaded file to its intended destination.
      *
      * @param  CodeSleeve\Stapler\File\FileInterface $file
      * @param  string $filePath
      */
     public function move($file, $filePath)
     {
+        if ($file instanceof CodeSleeve\Stapler\File\S3FileInterface)
+        {
+            $this->moveOnS3($file, $filePath);
+        }
+        else
+        {
+            $this->moveToS3($file, $filePath);
+        }
+    }
+
+    /**
+     * Move a file on S3 to another location in the bucket.
+     *
+     * @param  CodeSleeve\Stapler\File\S3FileInterface $file
+     * @param  string $filePath
+     */
+    public function moveOnS3($file, $filePath)
+    {
+        $objectConfig = $this->attachedFile->s3_object_config;
+
+        $fileSpecificConfig = [
+            'Key' => $filePath,
+            'CopySource' => $file->getRealPath(),
+        ];
+        $mergedConfig = array_merge($objectConfig, $fileSpecificConfig);
+
+        $this->ensureBucketExists($mergedConfig['Bucket']);
+        $this->s3Client->copyObject($mergedConfig);
+
+        $fileSpecificConfig = [
+            'Key' => $file->getRealPath(),
+        ];
+        $this->s3Client->deleteObject($mergedConfig);
+    }
+
+    /**
+     * Move an uploaded file to its intended destination via
+     * the filesystem.
+     *
+     * @param  CodeSleeve\Stapler\File\FileInterface $file
+     * @param  string $filePath
+     */
+    public function moveToS3($file, $filePath)
+    {
         $localFile = $file->localize();
         $objectConfig = $this->attachedFile->s3_object_config;
         $fileSpecificConfig = ['Key' => $filePath, 'SourceFile' => $localFile->getRealPath(), 'ContentType' => $this->attachedFile->contentType()];
         $mergedConfig = array_merge($objectConfig, $fileSpecificConfig);
-        
+
         $this->ensureBucketExists($mergedConfig['Bucket']);
         $this->s3Client->putObject($mergedConfig);
     }
