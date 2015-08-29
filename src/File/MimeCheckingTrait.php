@@ -1,8 +1,6 @@
 <?php namespace Codesleeve\Stapler\File;
 
-use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
-
-class File extends SymfonyFile implements FileInterface
+trait MimeCheckingTrait
 {
     /**
      * An array of key value pairs for valid image
