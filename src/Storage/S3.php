@@ -62,6 +62,17 @@ class S3 implements StorageableInterface
     }
 
     /**
+     * Check existence for a file upload.
+     *
+     * @param  string $styleName
+     * @return boolean
+     */
+    public function exists($styleName)
+    {
+        return $this->s3Client->doesObjectExist($this->attachedFile->s3_object_config['Bucket'], $this->path($styleName), ['PathStyle' => true]);
+    }
+
+    /**
      * Return the key the uploaded file object is stored under within a bucket.
      *
      * @param  string $styleName

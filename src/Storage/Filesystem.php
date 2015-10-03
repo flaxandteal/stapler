@@ -118,6 +118,17 @@ class Filesystem implements StorageableInterface
     }
 
     /**
+     * Check existence for a file upload.
+     *
+     * @param  string $styleName
+     * @return boolean
+     */
+    public function exists($styleName)
+    {
+        return file_exists($this->path($styleName));
+    }
+
+    /**
      * Attempt to move an uploaded file to its intended location on disk.
      *
      * @param  Codesleeve\Stapler\File\LocalFileInterface $file

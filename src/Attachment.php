@@ -311,6 +311,17 @@ class Attachment implements StoredInterface
     }
 
     /**
+     * Checks storage driver for existence of the uploaded file.
+     *
+     * @param string $styleName
+     * @return string
+    */
+    public function exists($styleName = '')
+    {
+        return $this->storageDriver->exists($styleName);
+    }
+
+    /**
      * Generates an expiring url to an uploaded file (or a resized version of it),
      * or null if not possible for this file.
      *

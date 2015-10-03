@@ -46,4 +46,12 @@ interface StorageableInterface
      * @return void
      */
     public function move($file, $filePath);
+
+    /**
+     * Check existence for a file upload.
+     *
+     * @param  string $styleName
+     * @return boolean
+     */
+    public function exists($styleName);
 }
