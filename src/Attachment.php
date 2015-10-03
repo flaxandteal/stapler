@@ -409,7 +409,7 @@ class Attachment implements StoredInterface
 
             if ($style->dimensions && $file->isImage()) {
                 //TODO: this is the kind of thing someone might not want to do by accident
-                $file = $file->localize();
+                $file = $this->localize();
                 $file = $this->resizer->resize($file, $style);
             }
 
@@ -523,7 +523,7 @@ class Attachment implements StoredInterface
         {
             if ($style->dimensions && $this->uploadedFile->isImage()) {
                 //TODO: this is the kind of thing someone might not want to do by accident
-                $file = $file->localize();
+                $file = $this->localize();
                 $file = $this->resizer->resize($this->uploadedFile, $style);
             }
             else {
