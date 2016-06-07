@@ -136,7 +136,6 @@ class S3File implements S3FileInterface
     public function localize()
     {
         $name = $this->getFilename();
-        dd(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         $localFilePath = sys_get_temp_dir() . "/$name";
 
